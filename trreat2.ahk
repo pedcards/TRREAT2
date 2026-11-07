@@ -9,7 +9,7 @@ SendMode("Input")
 SetWorkingDir A_ScriptDir
 SetTitleMatchMode("2")
 
-#CapsLock::getPageDom()
+#Esc::getPageDom()
 
 ; ######################################################################################
 getPageDom() {
