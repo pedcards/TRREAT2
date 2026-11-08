@@ -4,7 +4,6 @@
 
 #Requires AutoHotkey v2
 #SingleInstance Force
-#Include "includes\"
 SendMode("Input")
 SetWorkingDir A_ScriptDir
 SetTitleMatchMode("2")
@@ -13,36 +12,66 @@ SetTitleMatchMode("2")
 
 ; ######################################################################################
 getPageDom() {
+	sections := ["Battery Voltage:","Estimated Longevity:","Last Charge Date:"
+				,"Sensing:","Impedance:","Defibrillation Impedance:","Thresholds:"]
+	chambers := ["Atrial =","RV =","LV ="]
+	setHeading := false
+	setSection := false
+	setChamber := false
+
 	hwnd := WinActive("ahk_exe msedge.exe")
-	browserEl := UIA.ElementFromHandle(hwnd)
-	frame := browserEl.FindElement({Type:"document",Name:"PaceMate LIVE"})
-	group := frame.FindElement({Type:"group"})
+	browser := UIA.ElementFromHandle(hwnd)
 
-	try {
-		devStat := browserEl.FindElement({AriaRole:"heading",Name:"DEVICE STATUS",MatchMode:"StartsWith"})
-
-		devStatBtn := devStat.FindElement({type:"link"})
-
-		if InStr(devStat.Name,"+") {
-			devStatBtn.Click()
-		}
-		dev := browserEl.FindElements({})
-		grpEl := group.FindElements({})
+	if !(group := isEvalPage(browser)) {
+		return
 	}
+
+	try openHeading(group,"DEVICE STATUS")
+	try openHeading(group,"PARAMETERS")
+	
+	grpEl := group.FindElements({})
 	for key,val in grpEl {
-		; a := dev.GetPropertyValue("AutomationId")
-		x := val.GetPropertyValue("name")
-		y := val.Name
-		; y := dev.GetPropertyValue("value")
-		; z := val.GetAllPropertyValues()
-		; OutputDebug(a ": " x ": " y "`n")
-		; val.Dump()
-		if InStr(x,"DEVICE STATUS") {
-			; el3 := val.WalkTree("+1")
+		if (val.AriaRole="heading") {
+			heading := matchHeading(val)
+			continue
+		}
+		if (val.AriaRole="description") {
+			for sName in sections {
+				if InStr(val.name,sName) {
+					section := sName
+					setSection := true
+					setHeading := false
+					break
+				}
+			}
+			continue
 		}
 	}
+}
+isEvalPage(obj) {
+	try {
+		group := obj.FindElement({Name:"Save & Approve"}).WalkTree("p2")
+		return group
+	}
+}
+openHeading(group,heading) {
+	header := group.FindElement({AriaRole:"heading",Name:heading,MatchMode:"StartsWith"})
+	headerBtn := header.FindElement({type:"link"})
+	if InStr(header.Name,"+") {
+		headerBtn.Click()
+	}
+}
+matchHeading(obj) {
+	headings := ["PATIENT INFO","DEVICE STATUS","PARAMETERS","OBSERVATIONS"]
+	for hName in headings {
+		if InStr(obj.name,hName) {
+			return hName
+		}
+	}
+	return obj.name
 }
 
 
 ; ###	Includes   #####################################################################
+#Include "includes\"
 #Include UIA.ahk
