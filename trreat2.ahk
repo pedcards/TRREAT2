@@ -61,8 +61,28 @@ openHeading(group,heading) {
 		headerBtn.Click()
 	}
 }
+getHeading(obj,heading) {
+	if !(key := findHeading(obj,heading)) {
+		return
+	}
+	obj.key := key
+	findSections(&obj)
+	return obj.txt
+
+}
+findHeading(obj,heading) {
+	loop obj.Length {
+		key := A_Index
+		val := obj[key]
+		if (val.AriaRole="heading") {
+			if (heading=matchHeading(val)) {
+				return key
+			}
+		}
+	}
+}
 matchHeading(obj) {
-	headings := ["PATIENT INFO","DEVICE STATUS","PARAMETERS","OBSERVATIONS"]
+	headings := ["PATIENT INFO","DEVICE STATUS","PARAMETERS","Current Events","OBSERVATIONS"]
 	for hName in headings {
 		if InStr(obj.name,hName) {
 			return hName
