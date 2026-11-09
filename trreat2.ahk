@@ -90,6 +90,77 @@ matchHeading(obj) {
 	}
 	return obj.name
 }
+findSections(&obj) {
+	sections := ["Battery Voltage:","Estimated Longevity:","Last Charge Date:"
+				,"Sensing:","Impedance:","Defibrillation Impedance:","Thresholds:"
+				,"Mode:","Base Rate:","Upper Track:","Upper Sensor:","Mode Switch:"
+				,"Paced AV:","Sensed AV:","Pacing %:"]
+	obj.txt := ""
+	loop obj.length {
+		if (A_Index < obj.key) {
+			continue
+		}
+		val := obj[A_Index]
+		if ObjHasValue(sections,val.Name) {
+			obj.key := A_Index
+			readSection(&obj,val.Name)
+			A_Index := obj.key
+		}
+	}
+}
+readSection(&obj,Name) {
+	chambers := ["Atrial =","RV =","LV ="]
+	txt := ""
+	isSection := false
+	loop obj.length {
+		if (A_Index < obj.key) {
+			continue
+		}
+		val := obj[A_Index]
+		type := val.AriaRole
+		if (type="textbox") {
+			txt .= val.value " "
+			continue
+		}
+		if (type="combobox") {
+			txt .= val.value " "
+			continue
+		}
+		if (SubStr(val.Name,-1)=":")&&(isSection=true) {
+			obj.txt .= Trim(txt) "`n"
+			obj.key := A_Index-1
+			return
+		}
+		if (type="description") {
+			if ObjHasValue(chambers,val.name) {
+				txt := Trim(txt) "`n"
+			}
+			txt .= val.name " "
+			isSection := true
+			continue
+		}
+	}
+
+}
+ObjHasValue(aObj, aValue, rx:="") {
+	for key, val in aObj
+		if (rx="RX") {																	; argument 3 is "RX" 
+			if (aValue="") {															; null aValue in "RX" is error
+				return false
+			}
+			if (val ~= aValue) {														; val=text, aValue=RX
+				return key
+			}
+			if (aValue ~= val) {														; aValue=text, val=RX
+				return key
+			}
+		} else {
+			if (val = aValue) {															; otherwise just string match
+				return key
+			}
+		}
+	return false																		; fails match, return err
+}
 
 
 ; ###	Includes   #####################################################################
