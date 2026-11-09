@@ -12,13 +12,6 @@ SetTitleMatchMode("2")
 
 ; ######################################################################################
 getPageDom() {
-	sections := ["Battery Voltage:","Estimated Longevity:","Last Charge Date:"
-				,"Sensing:","Impedance:","Defibrillation Impedance:","Thresholds:"]
-	chambers := ["Atrial =","RV =","LV ="]
-	setHeading := false
-	setSection := false
-	setChamber := false
-
 	hwnd := WinActive("ahk_exe msedge.exe")
 	browser := UIA.ElementFromHandle(hwnd)
 
@@ -30,23 +23,10 @@ getPageDom() {
 	try openHeading(group,"PARAMETERS")
 	
 	grpEl := group.FindElements({})
-	for key,val in grpEl {
-		if (val.AriaRole="heading") {
-			heading := matchHeading(val)
-			continue
-		}
-		if (val.AriaRole="description") {
-			for sName in sections {
-				if InStr(val.name,sName) {
-					section := sName
-					setSection := true
-					setHeading := false
-					break
-				}
-			}
-			continue
-		}
-	}
+
+	t1 := getHeading(grpEl,"DEVICE STATUS")
+	t2 := getHeading(grpEL,"PARAMETERS")
+	t3 := getHeading(grpEL,"Current Events")
 }
 isEvalPage(obj) {
 	try {
