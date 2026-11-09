@@ -27,6 +27,8 @@ getPageDom() {
 	t1 := getHeading(grpEl,"DEVICE STATUS")
 	t2 := getHeading(grpEL,"PARAMETERS")
 	t3 := getHeading(grpEL,"Current Events")
+	makeObs(&grpEl)
+
 }
 isEvalPage(obj) {
 	try {
@@ -121,6 +123,31 @@ readSection(&obj,Name) {
 		}
 	}
 
+}
+makeObs(&obj) {
+	if !(key := findHeading(obj,"OBSERVATIONS")) {
+		return
+	}
+	obj.key := key
+	obj.txt := ""
+	isGroup := false
+	loop obj.Length {
+		if (A_Index<obj.key) {
+			continue
+		}
+		key := A_Index
+		val := obj[key]
+		type := val.AriaRole
+		if (type="group") {
+			isGroup:=true
+		}
+		if (isGroup=false) {
+			continue
+		}
+		if (type="description") {
+			obj[key]:=key
+		}
+	}
 }
 ObjHasValue(aObj, aValue, rx:="") {
 	for key, val in aObj
