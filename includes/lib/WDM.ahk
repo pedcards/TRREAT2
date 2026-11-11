@@ -153,13 +153,13 @@
 				else
 					this.zip := "edgedriver_win32.zip"
 				if RegExMatch(Version,"version ([\d.]+).*\n.*browser version is (\d+)",&BrowserVersion)
-					uri := "https://msedgedriver.azureedge.net/LATEST_" "RELEASE_" BrowserVersion[2]
+					uri := "https://msedgedriver.microsoft.com/LATEST_" "RELEASE_" BrowserVersion[2]
 				else if(Version != "STABLE")
-					uri := "https://msedgedriver.azureedge.net/LATEST_RELEASE_" Version
+					uri := "https://msedgedriver.microsoft.com/LATEST_RELEASE_" Version
 				else
-					uri := "https://msedgedriver.azureedge.net/LATEST_" Version ;, BrowserVersion[1] := "unknown"
+					uri := "https://msedgedriver.microsoft.com/LATEST_" Version ;, BrowserVersion[1] := "unknown"
 				this.DriverVersion := this.GetVersion(uri) ; Thanks RaptorX fixing Issues GetEdgeDrive
-				this.DriverUrl := "https://msedgedriver.azureedge.net/" this.DriverVersion "/" this.zip
+				this.DriverUrl := "https://msedgedriver.microsoft.com/" this.DriverVersion "/" this.zip
 			case "geckodriver.exe" :
 				; haven't received any error msg from previous driver tell about driver version
 				; therefor unable to figure out which driver to version to download as v0.028 support latest Firefox
