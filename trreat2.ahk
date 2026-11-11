@@ -13,8 +13,9 @@ SetTitleMatchMode("2")
 ; ######################################################################################
 getPageDom() {
 	hwnd := WinActive("ahk_exe msedge.exe")
-	browser := UIA.ElementFromHandle(hwnd)
-
+	browser := wbOpen()
+	sess := browser.Sessions()
+	
 	if !(group := isEvalPage(browser)) {
 		return
 	}
@@ -30,6 +31,41 @@ getPageDom() {
 	makeObs(&grpEl)
 
 }
+wbOpen() {
+/*	Use Rufaydium class https://github.com/Xeo786/Rufaydium-Webdriver
+	to use Google Chrome or Microsoft Edge webdriver to retrieve webpage
+*/
+	cr32Ver := cr64Ver := mseVer := ""
+	try cr32Ver := FileGetVersion("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
+	try cr64Ver := FileGetVersion("C:\Program Files\Google\Chrome\Application\chrome.exe")
+	try mseVer := FileGetVersion("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
+	
+	; if (cr64Ver) {
+	; 	verNum := cr64Ver
+	; 	driver := "chromedriver"
+	; } Else
+	; if (cr32Ver) {
+	; 	verNum := cr32Ver
+	; 	driver := "chromedriver"
+	; } Else
+	if (mseVer) {
+		verNum := mseVer
+		driver := "msedgedriver"
+	} Else {
+		MsgBox("Could not find installed Chrome or Edge.")
+		Return
+	}
+	Num :=  strX(verNum,"",0,1,".",1,1)
+
+	exe := A_ScriptDir "\includes\bin\" driver ".exe"
+	if !FileExist(exe) {
+		MsgBox("Could not find matching driver. Attempt download.")
+	}
+	wb := Rufaydium(driver,,0,0)
+
+	return wb
+}
+
 isEvalPage(obj) {
 	try {
 		group := obj.FindElement({Name:"Save & Approve"}).WalkTree("p2")
@@ -173,3 +209,5 @@ ObjHasValue(aObj, aValue, rx:="") {
 ; ###	Includes   #####################################################################
 #Include "includes\"
 #Include UIA.ahk
+#Include Rufaydium.ahk
+#Include strx2.ahk
