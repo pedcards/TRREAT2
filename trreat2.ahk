@@ -10,6 +10,16 @@ SetTitleMatchMode("2")
 
 #Esc::getPageDom()
 
+	t1 := "Battery Voltage: 3.00 V`nEstimated Longevity: 7 years and 9 months`nSensing:`nAtrial = 1.5 mV`nRV =  mV`nImpedance:`nAtrial = 3382 Ohms`nRV = 646 Ohms`nThresholds:`nAtrial = 0.75 V @ 0.4 ms`nRV = 2.125 V @ 0.4 ms`nMode: DDD`nBase Rate: 70 bpm`nUpper Track: 190 bpm`nUpper Sensor: 130 bpm`nMode Switch: 222 bpm`nPaced AV: 130 ms`nSensed AV: 100 ms AT/AF 222 bpm`n"
+	t2 := "Mode: DDD`nBase Rate: 70 bpm`nUpper Track: 190 bpm`nUpper Sensor: 130 bpm`nMode Switch: 222 bpm`nPaced AV: 130 ms`nSensed AV: 100 ms AT/AF 222 bpm`n"
+	
+	; makeGui(t1,t2)
+	choiceBox("Copy text",
+			"STATUS:`n" SubStr(t1,1,40) "...`n`n"
+			"PARAMETERS:`n" SubStr(t2,1,40) "...",
+			["Status","Parameters"],"-iconQ")
+
+
 ; ######################################################################################
 getPageDom() {
 	hwnd := WinActive("ahk_exe msedge.exe")
@@ -24,10 +34,14 @@ getPageDom() {
 	
 	grpEl := group.FindElements({})
 
-	t1 := getHeading(grpEl,"DEVICE STATUS")
-	t2 := getHeading(grpEL,"PARAMETERS")
-	t3 := getHeading(grpEL,"Current Events")
-	makeObs(&grpEl)
+	; t1 := getHeading(grpEl,"DEVICE STATUS")
+	; t2 := getHeading(grpEL,"PARAMETERS")
+	; t3 := getHeading(grpEL,"Current Events")
+
+	t1 := "Battery Voltage: 3.00 V`nEstimated Longevity: 7 years and 9 months`nSensing:`nAtrial = 1.5 mV`nRV =  mV`nImpedance:`nAtrial = 3382 Ohms`nRV = 646 Ohms`nThresholds:`nAtrial = 0.75 V @ 0.4 ms`nRV = 2.125 V @ 0.4 ms`nMode: DDD`nBase Rate: 70 bpm`nUpper Track: 190 bpm`nUpper Sensor: 130 bpm`nMode Switch: 222 bpm`nPaced AV: 130 ms`nSensed AV: 100 ms AT/AF 222 bpm`n"
+	t2 := "Mode: DDD`nBase Rate: 70 bpm`nUpper Track: 190 bpm`nUpper Sensor: 130 bpm`nMode Switch: 222 bpm`nPaced AV: 130 ms`nSensed AV: 100 ms AT/AF 222 bpm`n"
+	
+	makeGui(t1,t2)
 
 }
 isEvalPage(obj) {
@@ -124,6 +138,13 @@ readSection(&obj,Name) {
 	}
 
 }
+
+makeGui(status,params) {
+	obsGui := Gui("AlwaysOnTop","TRREAT Strings")
+	obsGui.MarginX := 10
+	obsGui.MarginY := 10
+}
+
 makeObs(&obj) {
 	if !(key := findHeading(obj,"OBSERVATIONS")) {
 		return
@@ -173,3 +194,4 @@ ObjHasValue(aObj, aValue, rx:="") {
 ; ###	Includes   #####################################################################
 #Include "includes\"
 #Include UIA.ahk
+#Include choicebox.ahk
